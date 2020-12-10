@@ -1,6 +1,7 @@
 model_data/*
 !model_data/coco.names
 IMAGES/*_pred*
+log
 
 # Created by https://www.toptal.com/developers/gitignore/api/vscode,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=vscode,python
