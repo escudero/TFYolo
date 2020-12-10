@@ -11,6 +11,13 @@
       "program": "./detection_demo.py",
       "console": "integratedTerminal",
       "pythonPath": "C:\\Anaconda3\\envs\\TFYolo\\python.exe"
+    }, {
+      "name": "Train",
+      "type": "python",
+      "request": "launch",
+      "program": "./train.py",
+      "console": "integratedTerminal",
+      "pythonPath": "C:\\Anaconda3\\envs\\TFYolo\\python.exe"
     }
   ]
 }
