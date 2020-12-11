@@ -1,15 +1,13 @@
-#================================================================
-#
-#   File name   : train.py
-#   Author      : PyLessons
-#   Created date: 2020-08-06
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : used to train custom object detector
-#
-#================================================================
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+# os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+if 'CUDA_VISIBLE_DEVICES' not in os.environ.keys():
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+if 'TF_FORCE_GPU_ALLOW_GROWTH' not in os.environ.keys():
+    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'false'
+print(f"CUDA_VISIBLE_DEVICES: {os.environ['CUDA_VISIBLE_DEVICES']}")
+print(f"TF_FORCE_GPU_ALLOW_GROWTH: {os.environ['TF_FORCE_GPU_ALLOW_GROWTH']}")
+
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 import shutil
@@ -21,12 +19,11 @@ from yolov3.yolov4 import Create_Yolo, compute_loss
 from yolov3.utils import load_yolo_weights
 from yolov3.configs import *
 from evaluate_mAP import get_mAP
-    
+
 if YOLO_TYPE == "yolov4":
     Darknet_weights = YOLO_V4_TINY_WEIGHTS if TRAIN_YOLO_TINY else YOLO_V4_WEIGHTS
 if YOLO_TYPE == "yolov3":
     Darknet_weights = YOLO_V3_TINY_WEIGHTS if TRAIN_YOLO_TINY else YOLO_V3_WEIGHTS
-if TRAIN_YOLO_TINY: TRAIN_MODEL_NAME += "_Tiny"
 
 def main():
     global TRAIN_FROM_CHECKPOINT
@@ -55,7 +52,7 @@ def main():
     yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, training=True, CLASSES=TRAIN_CLASSES)
     if TRAIN_FROM_CHECKPOINT:
         try:
-            yolo.load_weights(f"./checkpoints/{TRAIN_MODEL_NAME}")
+            yolo.load_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME))
         except ValueError:
             print("Shapes are incompatible, transfering Darknet weights")
             TRAIN_FROM_CHECKPOINT = False
@@ -165,16 +162,16 @@ def main():
         print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".
               format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
 
-        if TRAIN_SAVE_CHECKPOINT and not TRAIN_SAVE_BEST_ONLY:
-            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME+"_val_loss_{:7.2f}".format(total_val/count))
+        if not TRAIN_SAVE_BEST_ONLY:
+            if TRAIN_SAVE_CHECKPOINT:
+                save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME+"_val_loss_{:7.2f}".format(total_val/count))
+            else:
+                save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
             yolo.save_weights(save_directory)
-        if TRAIN_SAVE_BEST_ONLY and best_val_loss>total_val/count:
+        if TRAIN_SAVE_BEST_ONLY and (best_val_loss > total_val/count):
             save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
             yolo.save_weights(save_directory)
             best_val_loss = total_val/count
-        if not TRAIN_SAVE_BEST_ONLY and not TRAIN_SAVE_CHECKPOINT:
-            save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
-            yolo.save_weights(save_directory)
 
     # measure mAP of trained custom model
     mAP_model.load_weights(save_directory) # use keras weights

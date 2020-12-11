@@ -1,13 +1,3 @@
-#================================================================
-#
-#   File name   : utils.py
-#   Author      : PyLessons
-#   Created date: 2020-09-27
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : additional yolov3 and yolov4 functions
-#
-#================================================================
 from multiprocessing import Process, Queue, Pipe
 import cv2
 import time
@@ -104,7 +94,7 @@ def Load_Yolo_model():
             load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
         else:
             yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES)
-            yolo.load_weights(f"./checkpoints/{TRAIN_MODEL_NAME}") # use custom weights
+            yolo.load_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)) # use custom weights
         
     elif YOLO_FRAMEWORK == "trt": # TensorRT detection
         saved_model_loaded = tf.saved_model.load(YOLO_CUSTOM_WEIGHTS, tags=[tag_constants.SERVING])
