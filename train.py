@@ -172,7 +172,7 @@ def main():
             save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
             yolo.save_weights(save_directory)
             best_val_loss = total_val/count
-            if 'CALLBACK_BESTMODEL' not in os.environ.keys():
+            if 'CALLBACK_BESTMODEL' in os.environ.keys():
                 print('#Upload do modelo\n\n')
                 os.system(os.environ['CALLBACK_BESTMODEL'])
 
