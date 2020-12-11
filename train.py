@@ -159,8 +159,8 @@ def main():
             tf.summary.scalar("validate_loss/prob_val", prob_val/count, step=epoch)
         validate_writer.flush()
             
-        print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n".
-              format(giou_val/count, conf_val/count, prob_val/count, total_val/count))
+        print("\n\ngiou_val_loss:{:7.2f}, conf_val_loss:{:7.2f}, prob_val_loss:{:7.2f}, total_val_loss:{:7.2f}\n\n, best_val_loss:{:7.2f}\n\n".
+              format(giou_val/count, conf_val/count, prob_val/count, total_val/count, best_val_loss))
 
         if not TRAIN_SAVE_BEST_ONLY:
             if TRAIN_SAVE_CHECKPOINT:
@@ -172,6 +172,9 @@ def main():
             save_directory = os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)
             yolo.save_weights(save_directory)
             best_val_loss = total_val/count
+            if 'CALLBACK_BESTMODEL' not in os.environ.keys():
+                print('#Upload do modelo\n\n')
+                os.system(os.environ['CALLBACK_BESTMODEL'])
 
     # measure mAP of trained custom model
     mAP_model.load_weights(save_directory) # use keras weights
