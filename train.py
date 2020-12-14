@@ -174,7 +174,7 @@ def main():
             best_val_loss = total_val/count
             if 'CALLBACK_BESTMODEL' in os.environ.keys():
                 print('#Upload do modelo')
-                os.system(os.environ['CALLBACK_BESTMODEL'])
+                os.system(f"{os.environ['CALLBACK_BESTMODEL']} > /dev/null")
 
     # measure mAP of trained custom model
     mAP_model.load_weights(save_directory) # use keras weights
