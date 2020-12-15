@@ -173,7 +173,7 @@ def main():
             yolo.save_weights(save_directory)
             best_val_loss = total_val/count
             if 'CALLBACK_BESTMODEL' in os.environ.keys():
-                print('#Upload do modelo')
+                print('# CALLBACK\n')
                 os.system(f"{os.environ['CALLBACK_BESTMODEL']} > /dev/null")
 
     # measure mAP of trained custom model
