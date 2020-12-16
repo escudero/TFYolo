@@ -5,10 +5,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Detection Demo",
+      "name": "Detection Image",
       "type": "python",
       "request": "launch",
-      "program": "./detection_demo.py",
+      "program": "./detection.py",
       "console": "integratedTerminal",
       "pythonPath": "C:\\Anaconda3\\envs\\TFYolo\\python.exe"
     }, {
@@ -16,6 +16,13 @@
       "type": "python",
       "request": "launch",
       "program": "./train.py",
+      "console": "integratedTerminal",
+      "pythonPath": "C:\\Anaconda3\\envs\\TFYolo\\python.exe"
+    }, {
+      "name": "Performance",
+      "type": "python",
+      "request": "launch",
+      "program": "./performance.py",
       "console": "integratedTerminal",
       "pythonPath": "C:\\Anaconda3\\envs\\TFYolo\\python.exe"
     }
