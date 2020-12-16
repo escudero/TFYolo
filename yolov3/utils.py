@@ -313,6 +313,8 @@ def show_image(image, title, wait=0):
     else:
         if cv2.waitKey(wait) & 0xFF == ord("q"):
             cv2.destroyAllWindows()
+            return False
+    return True
 
 def save_image(image, image_filename_path):
     cv2.imwrite(image_filename_path, image)
@@ -347,7 +349,7 @@ def detect_image(model, images_list, output_path, input_size=YOLO_INPUT_SIZE, sh
     return bboxes_list
 
 
-def detect_video(model, filename_video_path, output_path, input_size=416, show=False, class_names=YOLO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+def detect_video(model, filename_video_path, output_path, input_size=416, show=False, class_names=YOLO_CLASSES, chunksize=1, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
     times, times_2 = [], []
     vid = cv2.VideoCapture(filename_video_path)
 
@@ -364,22 +366,31 @@ def detect_video(model, filename_video_path, output_path, input_size=416, show=F
         filename_output_path = os.path.join(output_path, filename_video)
         out = cv2.VideoWriter(filename_output_path, codec, fps, (width, height))
 
+    if chunksize is None:
+        chunksize = 1
     while True:
-        _, img = vid.read()
-        if img is None:
+        images_video = []
+        for _ in range(chunksize):
+            _, img = vid.read()
+            if img is None:
+                break
+            images_video.append(img)
+        if len(images_video) == 0:
             break
 
         return_images = output_path is not None or show
-        ret_detect_image = detect_image(model, img, None, input_size=YOLO_INPUT_SIZE, show=False, return_images=return_images, class_names=class_names,
+        ret_detect_image = detect_image(model, images_video, None, input_size=YOLO_INPUT_SIZE, show=False, return_images=return_images, class_names=class_names,
             score_threshold=score_threshold, iou_threshold=iou_threshold, rectangle_colors=rectangle_colors)
-
         bboxes_list, images = ret_detect_image if return_images else [ret_detect_image, None]
         
         if output_path is not None:
             [out.write(image) for image in images]
 
         if show:
-            for i, image in enumerate(images):
-                show_image(image, f'Image {i}', wait=25)
-            cv2.destroyAllWindows()
+            filename_video = os.path.basename(filename_video_path)
+            for image in images:
+                show = show_image(image, filename_video, wait=25)
+
+    if show:
+        cv2.destroyAllWindows()
 
