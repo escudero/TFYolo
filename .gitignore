@@ -1,8 +1,11 @@
 model_data/*
 !model_data/coco.names
 IMAGES/*_pred*
+IMAGES/predict
 yolov3/configs.py
+checkpoints
 log
+dataset
 
 # Created by https://www.toptal.com/developers/gitignore/api/vscode,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=vscode,python
