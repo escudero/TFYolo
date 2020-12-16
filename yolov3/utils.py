@@ -242,11 +242,11 @@ def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
     return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
 
 
-def pre_processing(images_path, input_size=YOLO_INPUT_SIZE):
+def pre_processing(images_list, input_size=YOLO_INPUT_SIZE):
     images_data, original_images = [], []
 
-    for image_path in images_path:
-        original_image = cv2.imread(image_path)
+    for image_item in images_list:
+        original_image = cv2.imread(image_item) if isinstance(image_item, str) else image_item
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
@@ -306,40 +306,81 @@ def post_processing(pred_bboxs, original_images, input_size=YOLO_INPUT_SIZE, sco
     return bboxes_list
 
 
-def show_image(image, title):
+def show_image(image, title, wait=0):
     cv2.imshow(title, image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
+    if wait == 0:
+        cv2.waitKey(wait)
+        cv2.destroyAllWindows()
+    else:
+        if cv2.waitKey(wait) & 0xFF == ord("q"):
+            cv2.destroyAllWindows()
 
 def save_image(image, image_filename_path):
     cv2.imwrite(image_filename_path, image)
 
+def detect_image(model, images_list, output_path, input_size=YOLO_INPUT_SIZE, show=False, return_images=False, class_names=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+    if not isinstance(images_list, list):
+        images_list = [images_list]
 
-def detect_image(model, images_path, output_path, input_size=YOLO_INPUT_SIZE, show=False, return_images=False, class_names=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
-    if not isinstance(images_path, list):
-        images_path = [images_path]
-
-    images_data, original_images = pre_processing(images_path=images_path, input_size=input_size)
+    images_data, original_images = pre_processing(images_list=images_list, input_size=input_size)
     pred_bboxs = predict(model=model, images_data=images_data)
     bboxes_list = post_processing(pred_bboxs=pred_bboxs, original_images=original_images, input_size=input_size, score_threshold=score_threshold, iou_threshold=iou_threshold)
 
     if return_images or output_path is not None or show:
         images = []
-        for bboxes, image_path, original_image in zip(bboxes_list, images_path, original_images):
+        for i, (bboxes, image_path, original_image) in enumerate(zip(bboxes_list, images_list, original_images)):
             image = draw_bbox(original_image, bboxes, class_names=class_names, rectangle_colors=rectangle_colors)
             images.append(image)
             
             if output_path is not None:
+                # O que acontece quando envia um imagem como objeto e não um path? Deve dar erro.
                 image_filename = os.path.basename(image_path)
                 image_filename_path = os.path.join(output_path, image_filename)
                 save_image(image, image_filename_path)
 
             if show:
-                image_filename = os.path.basename(image_path)
+                image_filename = os.path.basename(image_path) if isinstance(image_path, str) else f'Image {i}'
                 show_image(image, image_filename)
 
         if return_images:
             return bboxes_list, images
 
     return bboxes_list
+
+
+def detect_video(model, filename_video_path, output_path, input_size=416, show=False, class_names=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+    times, times_2 = [], []
+    vid = cv2.VideoCapture(filename_video_path)
+
+    if output_path is not None:
+        # by default VideoCapture returns float instead of int
+        width = int(vid.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = int(vid.get(cv2.CAP_PROP_FPS))
+        codec = cv2.VideoWriter_fourcc(*'XVID')
+        filename_video = os.path.basename(filename_video_path)
+        filename_video = filename_video.split('.')
+        filename_video[-1] = 'mp4'  # output_path must be .mp4
+        filename_video = '.'.join(filename_video)
+        filename_output_path = os.path.join(output_path, filename_video)
+        out = cv2.VideoWriter(filename_output_path, codec, fps, (width, height))
+
+    while True:
+        _, img = vid.read()
+        if img is None:
+            break
+
+        return_images = output_path is not None or show
+        ret_detect_image = detect_image(model, img, None, input_size=YOLO_INPUT_SIZE, show=False, return_images=return_images, class_names=class_names,
+            score_threshold=score_threshold, iou_threshold=iou_threshold, rectangle_colors=rectangle_colors)
+
+        bboxes_list, images = ret_detect_image if return_images else [ret_detect_image, None]
+        
+        if output_path is not None:
+            [out.write(image) for image in images]
+
+        if show:
+            for i, image in enumerate(images):
+                show_image(image, f'Image {i}', wait=25)
+            cv2.destroyAllWindows()
+
