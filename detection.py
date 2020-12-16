@@ -13,10 +13,10 @@ from yolov3.configs import YOLO_INPUT_SIZE, TRAIN_CLASSES, TRAIN_MODEL_NAME
 
 # image_path = os.path.join("IMAGES", "kite.jpg")
 image_path = [
-  os.path.join("dataset", "p1", "JPEGImages", "frame_004500.PNG"),
-  os.path.join("dataset", "p1", "JPEGImages", "frame_000480.PNG"),
-  os.path.join("dataset", "p1", "JPEGImages", "frame_001330.PNG"),
-  os.path.join("dataset", "p1", "JPEGImages", "frame_001730.PNG"),
+  os.path.join("IMAGES", "futebol01.png"),
+  os.path.join("IMAGES", "futebol02.png"),
+  os.path.join("IMAGES", "futebol01.png"),
+  os.path.join("IMAGES", "futebol02.png"),
 ]
 video_path = os.path.join("IMAGES", "test.mp4")
 output_path = os.path.join("IMAGES", "predict")

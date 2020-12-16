@@ -14,7 +14,7 @@ import tensorflow as tf
 #from tensorflow.keras.utils import plot_model
 from yolov3.dataset import Dataset
 from yolov3.yolov4 import Create_Yolo, compute_loss
-from yolov3.utils_old import load_yolo_weights
+from yolov3.utils import load_yolo_weights
 from yolov3.configs import *
 from evaluate_mAP import get_mAP
 

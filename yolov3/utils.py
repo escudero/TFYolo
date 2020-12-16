@@ -305,6 +305,17 @@ def post_processing(pred_bboxs, original_images, input_size=YOLO_INPUT_SIZE, sco
 
     return bboxes_list
 
+
+def show_image(image, title):
+    cv2.imshow(title, image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
+def save_image(image, image_filename_path):
+    cv2.imwrite(image_filename_path, image)
+
+
 def detect_image(model, images_path, output_path, input_size=YOLO_INPUT_SIZE, show=False, return_images=False, class_names=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
     if not isinstance(images_path, list):
         images_path = [images_path]
@@ -321,14 +332,14 @@ def detect_image(model, images_path, output_path, input_size=YOLO_INPUT_SIZE, sh
             
             if output_path is not None:
                 image_filename = os.path.basename(image_path)
-                cv2.imwrite(os.path.join(output_path, image_filename), image)
+                image_filename_path = os.path.join(output_path, image_filename)
+                save_image(image, image_filename_path)
 
             if show:
                 image_filename = os.path.basename(image_path)
-                cv2.imshow(image_filename, image)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+                show_image(image, image_filename)
 
         if return_images:
             return bboxes_list, images
+
     return bboxes_list
