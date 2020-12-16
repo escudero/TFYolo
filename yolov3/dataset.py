@@ -14,7 +14,7 @@ import cv2
 import random
 import numpy as np
 import tensorflow as tf
-from yolov3.utils import read_class_names, image_preprocess
+from yolov3.utils import read_class_names, image_resize
 from yolov3.yolov4 import bbox_iou
 from yolov3.configs import *
 
@@ -212,7 +212,7 @@ class Dataset(object):
         if mAP == True: 
             return image, bboxes
         
-        image, bboxes = image_preprocess(np.copy(image), [self.input_sizes, self.input_sizes], np.copy(bboxes))
+        image, bboxes = image_resize(np.copy(image), [self.input_sizes, self.input_sizes], np.copy(bboxes))
         return image, bboxes
 
     def preprocess_true_boxes(self, bboxes):

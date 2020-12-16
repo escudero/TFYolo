@@ -1,6 +1,4 @@
 import os
-# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-# os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 if 'CUDA_VISIBLE_DEVICES' not in os.environ.keys():
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 if 'TF_FORCE_GPU_ALLOW_GROWTH' not in os.environ.keys():
@@ -16,7 +14,7 @@ import tensorflow as tf
 #from tensorflow.keras.utils import plot_model
 from yolov3.dataset import Dataset
 from yolov3.yolov4 import Create_Yolo, compute_loss
-from yolov3.utils import load_yolo_weights
+from yolov3.utils_old import load_yolo_weights
 from yolov3.configs import *
 from evaluate_mAP import get_mAP
 

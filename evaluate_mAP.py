@@ -16,7 +16,7 @@ import tensorflow as tf
 from tensorflow.python.saved_model import tag_constants
 from yolov3.dataset import Dataset
 from yolov3.yolov4 import Create_Yolo
-from yolov3.utils import load_yolo_weights, detect_image, image_preprocess, postprocess_boxes, nms, read_class_names
+from yolov3.utils import load_yolo_weights, detect_image, image_resize, postprocess_boxes, nms, read_class_names
 from yolov3.configs import *
 import shutil
 import json

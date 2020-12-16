@@ -5,7 +5,7 @@ print(f"Quantidade de GPUs: {len(gpus)}")
 import cv2
 
 from yolov3.yolov4 import Create_Yolo
-from yolov3.utils import detect_image
+from yolov3.utils_old import detect_image
 from yolov3.configs import YOLO_INPUT_SIZE, TRAIN_CLASSES, TRAIN_MODEL_NAME, YOLO_FRAMEWORK
 
 model = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES)
@@ -13,14 +13,14 @@ model.load_weights(f"./checkpoints/{TRAIN_MODEL_NAME}")
 
 import numpy as np
 import tensorflow as tf
-from yolov3.utils import image_preprocess, postprocess_boxes, nms
+from yolov3.utils import image_resize, postprocess_boxes, nms
 
 def pre_processing(image_path, input_size=YOLO_INPUT_SIZE):
     original_image = cv2.imread(image_path)
     original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
     original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
-    image_data = image_preprocess(np.copy(original_image), [input_size, input_size])
+    image_data = image_resize(np.copy(original_image), [input_size, input_size])
     image_data = image_data[np.newaxis, ...].astype(np.float32)
     return image_data, original_image
 
