@@ -29,7 +29,7 @@ class Dataset(object):
 
         self.train_input_sizes = TRAIN_INPUT_SIZE
         self.strides = np.array(YOLO_STRIDES)
-        self.classes = read_class_names(TRAIN_CLASSES)
+        self.classes = read_class_names(YOLO_CLASSES)
         self.num_classes = len(self.classes)
         self.anchors = (np.array(YOLO_ANCHORS).T/self.strides).T
         self.anchor_per_scale = YOLO_ANCHOR_PER_SCALE

@@ -8,7 +8,7 @@ print(f"TF_FORCE_GPU_ALLOW_GROWTH: {os.environ['TF_FORCE_GPU_ALLOW_GROWTH']}")
 
 from yolov3.yolov4 import Create_Yolo
 from yolov3.utils import detect_image, detect_video
-from yolov3.configs import YOLO_INPUT_SIZE, TRAIN_CLASSES, TRAIN_MODEL_NAME, YOLO_COCO_CLASSES
+from yolov3.configs import YOLO_INPUT_SIZE, TRAIN_MODEL_NAME, YOLO_CLASSES
 
 
 # image_path = os.path.join("IMAGES", "kite.jpg")
@@ -21,10 +21,10 @@ image_path = [
 video_path = os.path.join("IMAGES", "futebol.mp4")
 output_path = os.path.join("IMAGES", "predict")
 
-model = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES)
+model = Create_Yolo(input_size=YOLO_INPUT_SIZE, class_names=YOLO_CLASSES)
 model.load_weights(f"./checkpoints/{TRAIN_MODEL_NAME}")
 
 # output_path = None
 
-# detect_image(model, image_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, return_images=False, rectangle_colors=(255,0,0))
-detect_video(model, video_path, output_path, input_size=416, show=False, class_names=TRAIN_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='')
+detect_image(model, image_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, return_images=False, class_names=YOLO_CLASSES, rectangle_colors=(255,0,0))
+# detect_video(model, video_path, output_path, input_size=416, show=False, class_names=YOLO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='')

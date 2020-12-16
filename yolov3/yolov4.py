@@ -16,7 +16,7 @@ from yolov3.configs import (
     YOLO_TYPE,
     YOLO_STRIDES,
     YOLO_ANCHORS,
-    YOLO_COCO_CLASSES,
+    YOLO_CLASSES,
     YOLO_IOU_LOSS_THRESH,
     TRAIN_YOLO_TINY
 )
@@ -382,8 +382,8 @@ def YOLOv4_tiny(input_layer, NUM_CLASS):
 
     return [conv_mbbox, conv_lbbox]
 
-def Create_Yolo(input_size=416, channels=3, training=False, CLASSES=YOLO_COCO_CLASSES):
-    NUM_CLASS = len(read_class_names(CLASSES))
+def Create_Yolo(input_size=416, channels=3, training=False, class_names=YOLO_CLASSES):
+    NUM_CLASS = len(read_class_names(class_names))
     input_layer  = Input([input_size, input_size, channels])
 
     if TRAIN_YOLO_TINY:
@@ -533,8 +533,8 @@ def bbox_ciou(boxes1, boxes2):
     return iou - ciou_term
 
 
-def compute_loss(pred, conv, label, bboxes, i=0, CLASSES=YOLO_COCO_CLASSES):
-    NUM_CLASS = len(read_class_names(CLASSES))
+def compute_loss(pred, conv, label, bboxes, i=0, class_names=YOLO_CLASSES):
+    NUM_CLASS = len(read_class_names(class_names))
     conv_shape  = tf.shape(conv)
     batch_size  = conv_shape[0]
     output_size = conv_shape[1]

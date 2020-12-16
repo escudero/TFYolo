@@ -137,7 +137,7 @@ I will give two examples, both will be for YOLOv4 model,quantize_mode=INT8 and m
 - In `configs.py` script set `YOLO_INPUT_SIZE = 608`;
 - Train custom YOLO model with instructions above;
 - In `configs.py` script set `YOLO_CUSTOM_WEIGHTS = f"{YOLO_TYPE}_custom"`;
-- In `configs.py` script make sure that  `TRAIN_CLASSES` is with your custom classes text file;
+- In `configs.py` script make sure that  `YOLO_CLASSES` is with your custom classes text file;
 - From main directory in terminal type `python tools/Convert_to_pb.py`;
 - From main directory in terminal type `python tools/Convert_to_TRT.py`;
 - In `configs.py` script set `YOLO_FRAMEWORK = "trt"`;

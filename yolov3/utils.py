@@ -7,10 +7,9 @@ from yolov3.configs import (
     YOLO_V3_WEIGHTS,
     YOLO_V4_WEIGHTS,
     YOLO_INPUT_SIZE,
-    YOLO_COCO_CLASSES,
+    YOLO_CLASSES,
     YOLO_FRAMEWORK,
     TRAIN_YOLO_TINY,
-    TRAIN_CLASSES,
     TRAIN_MODEL_NAME
 )
 from yolov3.yolov4 import Create_Yolo, read_class_names
@@ -97,7 +96,7 @@ def image_resize(image, target_size, gt_boxes=None):
         return image_paded, gt_boxes
 
 
-def draw_bbox(image, bboxes, class_names=YOLO_COCO_CLASSES, show_label=True, show_confidence = True, Text_colors=(255,255,0), rectangle_colors=''):   
+def draw_bbox(image, bboxes, class_names=YOLO_CLASSES, show_label=True, show_confidence = True, Text_colors=(255,255,0), rectangle_colors=''):   
     NUM_CLASS = read_class_names(class_names)
     num_classes = len(NUM_CLASS)
     image_h, image_w, _ = image.shape
@@ -318,7 +317,7 @@ def show_image(image, title, wait=0):
 def save_image(image, image_filename_path):
     cv2.imwrite(image_filename_path, image)
 
-def detect_image(model, images_list, output_path, input_size=YOLO_INPUT_SIZE, show=False, return_images=False, class_names=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+def detect_image(model, images_list, output_path, input_size=YOLO_INPUT_SIZE, show=False, return_images=False, class_names=YOLO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
     if not isinstance(images_list, list):
         images_list = [images_list]
 
@@ -348,7 +347,7 @@ def detect_image(model, images_list, output_path, input_size=YOLO_INPUT_SIZE, sh
     return bboxes_list
 
 
-def detect_video(model, filename_video_path, output_path, input_size=416, show=False, class_names=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+def detect_video(model, filename_video_path, output_path, input_size=416, show=False, class_names=YOLO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
     times, times_2 = [], []
     vid = cv2.VideoCapture(filename_video_path)
 

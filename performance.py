@@ -6,9 +6,9 @@ import cv2
 
 from yolov3.yolov4 import Create_Yolo
 from yolov3.utils import detect_image
-from yolov3.configs import YOLO_INPUT_SIZE, TRAIN_CLASSES, TRAIN_MODEL_NAME, YOLO_FRAMEWORK
+from yolov3.configs import YOLO_INPUT_SIZE, YOLO_CLASSES, TRAIN_MODEL_NAME, YOLO_FRAMEWORK
 
-model = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES)
+model = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_CLASSES)
 model.load_weights(f"./checkpoints/{TRAIN_MODEL_NAME}")
 
 import numpy as np

@@ -78,7 +78,7 @@ def voc_ap(rec, prec):
 
 def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, TEST_INPUT_SIZE=TEST_INPUT_SIZE):
     MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
-    NUM_CLASS = read_class_names(TRAIN_CLASSES)
+    NUM_CLASS = read_class_names(YOLO_CLASSES)
 
     ground_truth_dir_path = 'mAP/ground-truth'
     if os.path.exists(ground_truth_dir_path): shutil.rmtree(ground_truth_dir_path)
@@ -282,10 +282,10 @@ if __name__ == '__main__':
             Darknet_weights = YOLO_V3_TINY_WEIGHTS if TRAIN_YOLO_TINY else YOLO_V3_WEIGHTS
 
         if YOLO_CUSTOM_WEIGHTS == False:
-            yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_COCO_CLASSES)
+            yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_CLASSES)
             load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
         else:
-            yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=TRAIN_CLASSES)
+            yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_CLASSES)
             yolo.load_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)) # use custom weights
         
     elif YOLO_FRAMEWORK == "trt": # TensorRT detection
