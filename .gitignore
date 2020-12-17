@@ -3,7 +3,8 @@ model_data/*
 IMAGES/*_pred*
 IMAGES/predict
 yolov3/configs.py
-checkpoints
+checkpoints/*
+!checkpoints/KEEPME
 log
 dataset
 
