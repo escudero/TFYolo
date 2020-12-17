@@ -1,10 +1,11 @@
 model_data/*
 !model_data/coco.names
 IMAGES/*_pred*
-IMAGES/predict
 yolov3/configs.py
 checkpoints/*
 !checkpoints/KEEPME
+IMAGES/predict/*
+!IMAGES/predict/KEEPME
 log
 dataset
 
