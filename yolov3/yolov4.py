@@ -18,6 +18,7 @@ from yolov3.configs import (
     YOLO_ANCHORS,
     YOLO_CLASSES,
     YOLO_IOU_LOSS_THRESH,
+    YOLO_INPUT_SIZE,
     TRAIN_YOLO_TINY
 )
 
@@ -382,7 +383,7 @@ def YOLOv4_tiny(input_layer, NUM_CLASS):
 
     return [conv_mbbox, conv_lbbox]
 
-def Create_Yolo(input_size=416, channels=3, training=False, class_names=YOLO_CLASSES):
+def Create_Yolo(input_size=YOLO_INPUT_SIZE, channels=3, training=False, class_names=YOLO_CLASSES):
     NUM_CLASS = len(read_class_names(class_names))
     input_layer  = Input([input_size, input_size, channels])
 

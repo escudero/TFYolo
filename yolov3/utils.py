@@ -349,7 +349,7 @@ def detect_image(model, images_list, output_path, input_size=YOLO_INPUT_SIZE, sh
     return bboxes_list
 
 
-def detect_video(model, filename_video_path, output_path, input_size=416, show=False, class_names=YOLO_CLASSES, chunksize=1, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+def detect_video(model, filename_video_path, output_path, input_size=YOLO_INPUT_SIZE, show=False, class_names=YOLO_CLASSES, chunksize=1, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
     times, times_2 = [], []
     vid = cv2.VideoCapture(filename_video_path)
 
@@ -389,6 +389,8 @@ def detect_video(model, filename_video_path, output_path, input_size=416, show=F
         if show:
             filename_video = os.path.basename(filename_video_path)
             for image in images:
+                if not show:
+                    break
                 show = show_image(image, filename_video, wait=25)
 
     if show:

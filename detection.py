@@ -29,6 +29,6 @@ output_path = None
 
 dt1 = datetime.now()
 # detect_image(model, image_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, return_images=False, class_names=YOLO_CLASSES, rectangle_colors=(255,0,0))
-detect_video(model, video_path, output_path, input_size=416, show=True, class_names=YOLO_CLASSES, chunksize=10, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='')
+detect_video(model, video_path, output_path, input_size=YOLO_INPUT_SIZE, show=True, class_names=YOLO_CLASSES, chunksize=10, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='')
 dt2 = datetime.now()
 print(f'Tempo: {dt2 - dt1}')

@@ -76,7 +76,7 @@ def voc_ap(rec, prec):
     return ap, mrec, mpre
 
 
-def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, TEST_INPUT_SIZE=TEST_INPUT_SIZE):
+def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, input_size=YOLO_INPUT_SIZE):
     MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
     NUM_CLASS = read_class_names(YOLO_CLASSES)
 
@@ -132,7 +132,7 @@ def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, TEST_INPUT_
         image_name = ann_dataset[0].split('/')[-1]
         original_image, bbox_data_gt = dataset.parse_annotation(ann_dataset, True)
         
-        image = image_preprocess(np.copy(original_image), [TEST_INPUT_SIZE, TEST_INPUT_SIZE])
+        image = image_preprocess(np.copy(original_image), [input_size, input_size])
         image_data = image[np.newaxis, ...].astype(np.float32)
 
         t1 = time.time()
@@ -153,7 +153,7 @@ def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, TEST_INPUT_
         pred_bbox = [tf.reshape(x, (-1, tf.shape(x)[-1])) for x in pred_bbox]
         pred_bbox = tf.concat(pred_bbox, axis=0)
 
-        bboxes = postprocess_boxes(pred_bbox, original_image, TEST_INPUT_SIZE, score_threshold)
+        bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
         bboxes = nms(bboxes, iou_threshold, method='nms')
 
         for bbox in bboxes:
@@ -293,5 +293,5 @@ if __name__ == '__main__':
         signature_keys = list(saved_model_loaded.signatures.keys())
         yolo = saved_model_loaded.signatures['serving_default']
 
-    testset = Dataset('test', TEST_INPUT_SIZE=YOLO_INPUT_SIZE)
-    get_mAP(yolo, testset, score_threshold=0.05, iou_threshold=0.50, TEST_INPUT_SIZE=YOLO_INPUT_SIZE)
+    testset = Dataset('test', input_size=YOLO_INPUT_SIZE)
+    get_mAP(yolo, testset, score_threshold=0.05, iou_threshold=0.50, input_size=YOLO_INPUT_SIZE)

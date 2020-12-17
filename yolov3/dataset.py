@@ -21,13 +21,13 @@ from yolov3.configs import *
 
 class Dataset(object):
     # Dataset preprocess implementation
-    def __init__(self, dataset_type, TEST_INPUT_SIZE=TEST_INPUT_SIZE):
+    def __init__(self, dataset_type, input_size=YOLO_INPUT_SIZE):
         self.annot_path  = TRAIN_ANNOT_PATH if dataset_type == 'train' else TEST_ANNOT_PATH
-        self.input_sizes = TRAIN_INPUT_SIZE if dataset_type == 'train' else TEST_INPUT_SIZE
-        self.batch_size  = TRAIN_BATCH_SIZE if dataset_type == 'train' else TEST_BATCH_SIZE
+        self.input_sizes = YOLO_INPUT_SIZE
+        self.batch_size  = TRAIN_BATCH_SIZE
         self.data_aug    = TRAIN_DATA_AUG   if dataset_type == 'train' else TEST_DATA_AUG
 
-        self.train_input_sizes = TRAIN_INPUT_SIZE
+        self.train_input_sizes = YOLO_INPUT_SIZE
         self.strides = np.array(YOLO_STRIDES)
         self.classes = read_class_names(YOLO_CLASSES)
         self.num_classes = len(self.classes)
