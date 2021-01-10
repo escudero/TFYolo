@@ -74,26 +74,32 @@ def load_yolo_weights(model, weights_file):
         assert len(wf.read()) == 0, 'failed to read all data'
 
 
-def image_resize(image, target_size, gt_boxes=None):
-    ih, iw    = target_size
-    h,  w, _  = image.shape
-
-    scale = min(iw/w, ih/h)
-    nw, nh  = int(scale * w), int(scale * h)
-    image_resized = cv2.resize(image, (nw, nh))
-
-    image_paded = np.full(shape=[ih, iw, 3], fill_value=128.0)
-    dw, dh = (iw - nw) // 2, (ih-nh) // 2
-    image_paded[dh:nh+dh, dw:nw+dw, :] = image_resized
-    image_paded = image_paded / 255.
-
+def image_resize(images, target_size, gt_boxes=None):
     if gt_boxes is None:
-        return image_paded
-
+        images = tf.image.resize_with_pad(images, 500, 416, antialias=False).numpy()
+        return images / 255
     else:
-        gt_boxes[:, [0, 2]] = gt_boxes[:, [0, 2]] * scale + dw
-        gt_boxes[:, [1, 3]] = gt_boxes[:, [1, 3]] * scale + dh
-        return image_paded, gt_boxes
+        image_paded_list, gt_boxes_list = [], []
+        for image in images:
+            ih, iw    = target_size
+            h,  w, _  = image.shape
+
+            scale = min(iw/w, ih/h)
+            nw, nh  = int(scale * w), int(scale * h)
+            image_resized = cv2.resize(image, (nw, nh))
+
+            image_paded = np.full(shape=[ih, iw, 3], fill_value=0.0)
+            dw, dh = (iw - nw) // 2, (ih-nh) // 2
+            image_paded[dh:nh+dh, dw:nw+dw, :] = image_resized
+            image_paded = image_paded / 255.
+
+            gt_boxes[:, [0, 2]] = gt_boxes[:, [0, 2]] * scale + dw
+            gt_boxes[:, [1, 3]] = gt_boxes[:, [1, 3]] * scale + dh
+
+            image_paded_list.append(image_paded)
+            gt_boxes_list.append(gt_boxes)
+
+        return image_paded_list, gt_boxes_list
 
 
 def draw_bbox(image, bboxes, class_names=YOLO_CLASSES, show_label=True, show_confidence = True, Text_colors=(255,255,0), rectangle_colors=''):   
@@ -240,22 +246,37 @@ def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
 
     return np.concatenate([coors, scores[:, np.newaxis], classes[:, np.newaxis]], axis=-1)
 
+# def pre_processing(images_list, input_size=YOLO_INPUT_SIZE):
+#     images_data, original_images = [], []
+
+#     for image_item in images_list:
+#         original_image = cv2.imread(image_item) if isinstance(image_item, str) else image_item
+#         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+#         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+
+#         image_data = image_resize(np.copy(original_image), [input_size, input_size])
+#         image_data = image_data[np.newaxis, ...].astype(np.float32)
+
+#         images_data.append(image_data)
+#         original_images.append(original_image)
+
+#     images_data = np.array([image_data.reshape(image_data.shape[1:]) for image_data in images_data])
+#     original_images = np.array(original_images)
+
+#     return images_data, original_images
 
 def pre_processing(images_list, input_size=YOLO_INPUT_SIZE):
-    images_data, original_images = [], []
-
+    
+    original_images = []
     for image_item in images_list:
         original_image = cv2.imread(image_item) if isinstance(image_item, str) else image_item
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-
-        image_data = image_resize(np.copy(original_image), [input_size, input_size])
-        image_data = image_data[np.newaxis, ...].astype(np.float32)
-
-        images_data.append(image_data)
         original_images.append(original_image)
 
-    images_data = np.array([image_data.reshape(image_data.shape[1:]) for image_data in images_data])
+    images_data = image_resize(original_images, [input_size, input_size])
+    images_data = images_data.astype(np.float32)
+
     original_images = np.array(original_images)
 
     return images_data, original_images

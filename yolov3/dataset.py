@@ -212,7 +212,8 @@ class Dataset(object):
         if mAP == True: 
             return image, bboxes
         
-        image, bboxes = image_resize(np.copy(image), [self.input_sizes, self.input_sizes], np.copy(bboxes))
+        image, bboxes = image_resize([np.copy(image)], [self.input_sizes, self.input_sizes], np.copy(bboxes))
+        image, bboxes = image[0], bboxes[0]
         return image, bboxes
 
     def preprocess_true_boxes(self, bboxes):
