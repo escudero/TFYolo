@@ -36,11 +36,14 @@ for t in [1, 5, 10, 60]:
     dt1 = datetime.now()
     pred_bboxs = predict(model, images_data)
     print(f'Tempo de {t}: {(datetime.now() - dt1).total_seconds()}')
+    del images_data
     
     print(f'# Testando de {t} / Pos-processamento', end=' : ')
     dt1 = datetime.now()
     post_processing(pred_bboxs, original_images, input_size=YOLO_INPUT_SIZE)
     print(f'Tempo de {t}: {(datetime.now() - dt1).total_seconds()}')
+    del original_images
+    del pred_bboxs
   
     print(f'# Testando de {t} / Total', end=' : ')
     dt1 = datetime.now()
