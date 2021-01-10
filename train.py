@@ -44,10 +44,10 @@ def main():
     total_steps = TRAIN_EPOCHS * steps_per_epoch
 
     if TRAIN_TRANSFER:
-        Darknet = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_CLASSES)
+        Darknet = Create_Yolo(input_size=YOLO_INPUT_SIZE, class_names=YOLO_CLASSES)
         load_yolo_weights(Darknet, Darknet_weights) # use darknet weights
 
-    yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, training=True, CLASSES=YOLO_CLASSES)
+    yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, training=True, class_names=YOLO_CLASSES)
     if TRAIN_FROM_CHECKPOINT:
         try:
             yolo.load_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME))
@@ -76,7 +76,7 @@ def main():
             grid = 3 if not TRAIN_YOLO_TINY else 2
             for i in range(grid):
                 conv, pred = pred_result[i*2], pred_result[i*2+1]
-                loss_items = compute_loss(pred, conv, *target[i], i, CLASSES=YOLO_CLASSES)
+                loss_items = compute_loss(pred, conv, *target[i], i, class_names=YOLO_CLASSES)
                 giou_loss += loss_items[0]
                 conf_loss += loss_items[1]
                 prob_loss += loss_items[2]
@@ -117,7 +117,7 @@ def main():
             grid = 3 if not TRAIN_YOLO_TINY else 2
             for i in range(grid):
                 conv, pred = pred_result[i*2], pred_result[i*2+1]
-                loss_items = compute_loss(pred, conv, *target[i], i, CLASSES=YOLO_CLASSES)
+                loss_items = compute_loss(pred, conv, *target[i], i, class_names=YOLO_CLASSES)
                 giou_loss += loss_items[0]
                 conf_loss += loss_items[1]
                 prob_loss += loss_items[2]
@@ -126,7 +126,7 @@ def main():
             
         return giou_loss.numpy(), conf_loss.numpy(), prob_loss.numpy(), total_loss.numpy()
 
-    mAP_model = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_CLASSES) # create second model to measure mAP
+    mAP_model = Create_Yolo(input_size=YOLO_INPUT_SIZE, class_names=YOLO_CLASSES) # create second model to measure mAP
 
     best_val_loss = np.inf
     for epoch in range(TRAIN_EPOCHS):
