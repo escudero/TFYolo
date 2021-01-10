@@ -77,7 +77,7 @@ def load_yolo_weights(model, weights_file):
 def image_resize(images, target_size, gt_boxes=None):
     if gt_boxes is None:
         images = tf.image.resize_with_pad(images, 500, 416, antialias=False).numpy()
-        return images / 255
+        return images / 255.
     else:
         image_paded_list, gt_boxes_list = [], []
         for image in images:
@@ -273,11 +273,9 @@ def pre_processing(images_list, input_size=YOLO_INPUT_SIZE):
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
         original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
         original_images.append(original_image)
+    original_images = np.array(original_images)
 
     images_data = image_resize(original_images, [input_size, input_size])
-    images_data = images_data.astype(np.float32)
-
-    original_images = np.array(original_images)
 
     return images_data, original_images
 
