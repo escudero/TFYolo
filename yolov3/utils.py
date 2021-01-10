@@ -76,7 +76,7 @@ def load_yolo_weights(model, weights_file):
 
 def image_resize(images, target_size, gt_boxes=None):
     if gt_boxes is None:
-        images = tf.image.resize_with_pad(images, 500, 416, antialias=False).numpy()
+        images = tf.image.resize_with_pad(images, target_size[0], target_size[1], antialias=False).numpy()
         return images / 255.
     else:
         image_paded_list, gt_boxes_list = [], []
