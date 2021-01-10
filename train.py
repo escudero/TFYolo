@@ -44,7 +44,7 @@ def main():
     total_steps = TRAIN_EPOCHS * steps_per_epoch
 
     if TRAIN_TRANSFER:
-        Darknet = Create_Yolo(input_size=YOLO_INPUT_SIZE, class_names=YOLO_CLASSES)
+        Darknet = Create_Yolo(input_size=YOLO_INPUT_SIZE, class_names=os.path.join('model_data', 'coco.names'))
         load_yolo_weights(Darknet, Darknet_weights) # use darknet weights
 
     yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, training=True, class_names=YOLO_CLASSES)
