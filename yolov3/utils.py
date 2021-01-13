@@ -1,7 +1,6 @@
 import tensorflow as tf
 from yolov3.configs import (
     YOLO_TYPE,
-    YOLO_CUSTOM_WEIGHTS,
     YOLO_V3_TINY_WEIGHTS,
     YOLO_V4_TINY_WEIGHTS,
     YOLO_V3_WEIGHTS,
