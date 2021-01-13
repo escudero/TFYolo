@@ -1,13 +1,3 @@
-#================================================================
-#
-#   File name   : evaluate_mAP.py
-#   Author      : PyLessons
-#   Created date: 2020-08-17
-#   Website     : https://pylessons.com/
-#   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
-#   Description : used to evaluate model mAP and FPS
-#
-#================================================================
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 import cv2
@@ -132,7 +122,7 @@ def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, input_size=
         image_name = ann_dataset[0].split('/')[-1]
         original_image, bbox_data_gt = dataset.parse_annotation(ann_dataset, True)
         
-        image = image_preprocess(np.copy(original_image), [input_size, input_size])
+        image = image_resize(np.copy(original_image), [input_size, input_size])
         image_data = image[np.newaxis, ...].astype(np.float32)
 
         t1 = time.time()
@@ -276,17 +266,8 @@ def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, input_size=
 
 if __name__ == '__main__':       
     if YOLO_FRAMEWORK == "tf": # TensorFlow detection
-        if YOLO_TYPE == "yolov4":
-            Darknet_weights = YOLO_V4_TINY_WEIGHTS if TRAIN_YOLO_TINY else YOLO_V4_WEIGHTS
-        if YOLO_TYPE == "yolov3":
-            Darknet_weights = YOLO_V3_TINY_WEIGHTS if TRAIN_YOLO_TINY else YOLO_V3_WEIGHTS
-
-        if YOLO_CUSTOM_WEIGHTS == False:
-            yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_CLASSES)
-            load_yolo_weights(yolo, Darknet_weights) # use Darknet weights
-        else:
-            yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, CLASSES=YOLO_CLASSES)
-            yolo.load_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)) # use custom weights
+        yolo = Create_Yolo(input_size=YOLO_INPUT_SIZE, class_names=YOLO_CLASSES)
+        yolo.load_weights(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME)) # use custom weights
         
     elif YOLO_FRAMEWORK == "trt": # TensorRT detection
         saved_model_loaded = tf.saved_model.load(os.path.join(TRAIN_CHECKPOINTS_FOLDER, TRAIN_MODEL_NAME), tags=[tag_constants.SERVING])
