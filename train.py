@@ -74,6 +74,7 @@ def main():
 
             # optimizing process
             grid = 3 if not TRAIN_YOLO_TINY else 2
+            grid = 1 if YOLO_TYPE == 'yolo_mod' else grid
             for i in range(grid):
                 conv, pred = pred_result[i*2], pred_result[i*2+1]
                 loss_items = compute_loss(pred, conv, *target[i], i, class_names=YOLO_CLASSES)

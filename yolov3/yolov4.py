@@ -373,6 +373,31 @@ def YOLOv4_tiny(input_layer, NUM_CLASS):
 
     return [conv_mbbox, conv_lbbox]
 
+def darknet_mod(input_data):
+    input_data = convolutional(input_data, filter_num=16, kernel_size=3)
+    input_data = MaxPool2D(2, 2, 'same')(input_data)
+    input_data = convolutional(input_data, filter_num=32, kernel_size=3)
+    input_data = MaxPool2D(2, 2, 'same')(input_data)
+    input_data = convolutional(input_data, filter_num=64, kernel_size=3)
+    input_data = MaxPool2D(2, 2, 'same')(input_data)
+    input_data = convolutional(input_data, filter_num=128, kernel_size=3)
+    input_data = MaxPool2D(2, 2, 'same')(input_data)
+    input_data = convolutional(input_data, filter_num=256, kernel_size=3)
+    input_data = MaxPool2D(2, 2, 'same')(input_data)
+    input_data = convolutional(input_data, filter_num=512, kernel_size=3)
+    input_data = MaxPool2D(2, 1, 'same')(input_data)
+    input_data = convolutional(input_data, filter_num=1024, kernel_size=3)
+    return input_data
+
+def YOLOModV1(input_layer, NUM_CLASS):
+    conv = darknet_mod(input_layer)
+
+    conv = convolutional(conv, filter_num=256, kernel_size=1)
+    conv = convolutional(conv, filter_num=512, kernel_size=3)
+    conv = convolutional(conv, filter_num=3*(NUM_CLASS+5), kernel_size=1, activate=False, bn=False)
+    conv = upsample(conv)
+    return [conv]
+
 def Create_Yolo(input_size=YOLO_INPUT_SIZE, channels=3, training=False, class_names=YOLO_CLASSES):
     NUM_CLASS = len(read_class_names(class_names))
     input_layer  = Input([input_size, input_size, channels])
@@ -382,6 +407,8 @@ def Create_Yolo(input_size=YOLO_INPUT_SIZE, channels=3, training=False, class_na
             conv_tensors = YOLOv4_tiny(input_layer, NUM_CLASS)
         elif YOLO_TYPE == "yolov3":
             conv_tensors = YOLOv3_tiny(input_layer, NUM_CLASS)
+        elif YOLO_TYPE == "yolo_mod":
+            conv_tensors = YOLOModV1(input_layer, NUM_CLASS)
     else:
         if YOLO_TYPE == "yolov4":
             conv_tensors = YOLOv4(input_layer, NUM_CLASS)
