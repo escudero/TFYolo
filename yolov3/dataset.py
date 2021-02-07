@@ -8,6 +8,43 @@ from yolov3.utils import read_class_names, image_resize
 from yolov3.yolov4 import bbox_iou
 from yolov3.configs import *
 
+from albumentations import (
+    Compose, BboxParams,
+    IAAPerspective, GaussNoise,
+    ShiftScaleRotate, HueSaturationValue,
+    RandomContrast, RandomBrightness
+)
+
+transformations = Compose([
+    IAAPerspective(p=0.5),
+    GaussNoise(var_limit=(0.05, 0.1), p=0.5),
+    ShiftScaleRotate(scale_limit=0.1, shift_limit=0, rotate_limit=15, p=0.5),
+    HueSaturationValue(hue_shift_limit=25/255, sat_shift_limit=25/255, val_shift_limit=25/255, p=0.5),
+    RandomContrast(limit=0.4, p=0.5),
+    RandomBrightness(limit=0.2, p=0.5),
+], bbox_params=BboxParams(format='albumentations', min_area=0, min_visibility=0.1, label_fields=['category_ids']))
+
+def aug_fn(image, targets):
+    bboxes = targets[:,0:4] / [image.shape[1], image.shape[0], image.shape[1], image.shape[0]]
+    category_ids = targets[:,4]
+    params = {
+        'image': image,
+        'bboxes': bboxes,
+        'category_ids': category_ids
+    }
+    aug_img = transformations(**params)
+    image = aug_img['image']
+    bboxes_aug = np.array([list(e) for e in aug_img['bboxes']])
+    category_ids_aug = aug_img['category_ids']
+
+    targets = np.zeros([bboxes_aug.shape[0], 5])
+    if len(targets) > 0:
+        bboxes_aug *= [image.shape[1], image.shape[0], image.shape[1], image.shape[0]]
+        targets[:,0:4] = bboxes_aug
+        targets[:,4] = category_ids_aug
+        targets = targets.astype(int)
+
+    return (image, targets)
 
 class Dataset(object):
     # Dataset preprocess implementation
@@ -194,9 +231,10 @@ class Dataset(object):
         bboxes = np.array([list(map(int, box.split(','))) for box in annotation[1]])
 
         if self.data_aug:
-            image, bboxes = self.random_horizontal_flip(np.copy(image), np.copy(bboxes))
-            image, bboxes = self.random_crop(np.copy(image), np.copy(bboxes))
-            image, bboxes = self.random_translate(np.copy(image), np.copy(bboxes))
+            image, bboxes = aug_fn(np.copy(image), np.copy(bboxes))
+            # image, bboxes = self.random_horizontal_flip(np.copy(image), np.copy(bboxes))
+            # image, bboxes = self.random_crop(np.copy(image), np.copy(bboxes))
+            # image, bboxes = self.random_translate(np.copy(image), np.copy(bboxes))
 
         #image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         if mAP == True: 
