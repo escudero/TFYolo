@@ -6,7 +6,7 @@ import tensorflow as tf
 from tensorflow.python.saved_model import tag_constants
 from yolov3.dataset import Dataset
 from yolov3.yolov4 import Create_Yolo
-from yolov3.utils import load_yolo_weights, detect_image, image_resize, postprocess_boxes, nms, read_class_names
+from yolov3.utils import load_yolo_weights, detect_image, image_resize, postprocess_boxes, ensembleboxes, read_class_names
 from yolov3.configs import *
 import shutil
 import json
@@ -66,7 +66,7 @@ def voc_ap(rec, prec):
     return ap, mrec, mpre
 
 
-def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, input_size=YOLO_INPUT_SIZE):
+def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, input_size=YOLO_INPUT_SIZE, method=YOLO_METHOD_ENSEMBLEBOXES):
     MINOVERLAP = 0.5 # default value (defined in the PASCAL VOC2012 challenge)
     NUM_CLASS = read_class_names(YOLO_CLASSES)
 
@@ -144,7 +144,7 @@ def get_mAP(Yolo, dataset, score_threshold=0.25, iou_threshold=0.50, input_size=
         pred_bbox = tf.concat(pred_bbox, axis=0)
 
         bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
-        bboxes = nms(bboxes, iou_threshold, method='nms')
+        bboxes = ensembleboxes(bboxes, iou_threshold, method=method)
 
         for bbox in bboxes:
             coor = np.array(bbox[:4], dtype=np.int32)
@@ -275,4 +275,11 @@ if __name__ == '__main__':
         yolo = saved_model_loaded.signatures['serving_default']
 
     testset = Dataset('test', input_size=YOLO_INPUT_SIZE)
-    get_mAP(yolo, testset, score_threshold=0.05, iou_threshold=0.50, input_size=YOLO_INPUT_SIZE)
+    
+    # for iou_threshold in range(55, 75, 5):
+    #     iou_threshold /= 100.0
+    #     for method in ["nms", "soft_nms", "nmw", "wbf"]:
+    #         print(f'{method}: {iou_threshold}')
+    #         get_mAP(yolo, testset, score_threshold=0.05, iou_threshold=iou_threshold, input_size=YOLO_INPUT_SIZE, method=method)
+
+    get_mAP(yolo, testset, score_threshold=0.05, iou_threshold=0.50, input_size=YOLO_INPUT_SIZE, method="nms")
