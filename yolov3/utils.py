@@ -165,11 +165,13 @@ def bboxes_iou(boxes1, boxes2):
 
     return ious
 
-def ensembleboxes(bboxes, iou_threshold, sigma=0.3, skip_box_thr=0.0001, method='nms'):
+def ensembleboxes(bboxes, iou_threshold, sigma=0.3, skip_box_thr=0.0001, method=YOLO_METHOD_ENSEMBLEBOXES):
     boxes_list = np.array([bboxes[:,0:4].tolist()])
     scores_list = np.array([bboxes[:,4].tolist()])
     labels_list = np.array([bboxes[:,5].tolist()])
 
+    if boxes_list.shape[-1] == 0:
+        return []
     max_value = np.amax(boxes_list)
     boxes_list /= max_value
 
@@ -280,7 +282,7 @@ def predict(model, images_data):
     return None
 
 
-def post_processing(pred_bboxs, original_images, input_size=YOLO_INPUT_SIZE, score_threshold=0.3, iou_threshold=0.45):
+def post_processing(pred_bboxs, original_images, input_size=YOLO_INPUT_SIZE, score_threshold=0.3, iou_threshold=0.45, method=YOLO_METHOD_ENSEMBLEBOXES):
     
     number_of_images = len(original_images)
     number_of_anchors = len(pred_bboxs)
@@ -303,7 +305,7 @@ def post_processing(pred_bboxs, original_images, input_size=YOLO_INPUT_SIZE, sco
         pred_bbox = tf.concat(pred_bbox, axis=0)
 
         bboxes = postprocess_boxes(pred_bbox, original_image, input_size, score_threshold)
-        bboxes = ensembleboxes(bboxes, iou_threshold, method=YOLO_METHOD_ENSEMBLEBOXES)
+        bboxes = ensembleboxes(bboxes, iou_threshold, method=method)
         
         bboxes_list.append(bboxes)
 
@@ -324,13 +326,13 @@ def show_image(image, title, wait=0):
 def save_image(image, image_filename_path):
     cv2.imwrite(image_filename_path, image)
 
-def detect_image(model, images_list, output_path, input_size=YOLO_INPUT_SIZE, show=False, return_images=False, class_names=YOLO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+def detect_image(model, images_list, output_path=None, input_size=YOLO_INPUT_SIZE, show=False, return_images=False, class_names=YOLO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors='', method=YOLO_METHOD_ENSEMBLEBOXES):
     if not isinstance(images_list, list):
         images_list = [images_list]
 
     images_data, original_images = pre_processing(images_list=images_list, input_size=input_size)
     pred_bboxs = predict(model=model, images_data=images_data)
-    bboxes_list = post_processing(pred_bboxs=pred_bboxs, original_images=original_images, input_size=input_size, score_threshold=score_threshold, iou_threshold=iou_threshold)
+    bboxes_list = post_processing(pred_bboxs=pred_bboxs, original_images=original_images, input_size=input_size, score_threshold=score_threshold, iou_threshold=iou_threshold, method=method)
 
     if return_images or output_path is not None or show:
         images = []
